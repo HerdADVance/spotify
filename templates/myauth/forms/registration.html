@@ -1,0 +1,16 @@
+{# {{registration_form}} #}
+
+<form action="{% url 'register_user' %}" method="POST" class="form-auth" id="form-registration">
+	{% csrf_token %}
+	
+	<input type="text" name= "username" placeholder="Username">
+	<input type="text" name= "email"  placeholder="E-Mail">
+	<input type="password" name= "password1" placeholder="Password (min. 8 chars)">
+	<input type="password" name= "password2" placeholder="Confirm Password">
+
+	{% if form_to_show != 'login' %}
+		{% include 'partials/errors.html' %}
+	{% endif %}
+
+	<input type="submit" value="Sign Up">
+</form>

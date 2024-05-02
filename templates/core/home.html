@@ -1,0 +1,61 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+<div class="con">
+	<div class="row">
+		<div class="col-4">
+			<h1>My Podcasts</h1>
+			<form action="{% url 'search-podcast' %}" method="POST">
+				{% csrf_token %}
+				<input type="text" name="search-query" placeholder="Search for podcasts">
+				<button class="submit">Submit</button>
+			</form>
+			<ul class="shows">
+				{% for show in shows %}
+					<li class="clear flex flex-row" data-id="{{ show.id }}">
+						<img src="{{ show.image }}">
+						<strong>{{ show.name }}</strong>
+						<!-- {{ show.html_description|safe }}
+						<p style="color: white;">Episodes: {{ show.num_episodes }}</p>
+						<p style="color: white">{{ show.id }}</p>
+						<form action="{% url 'add-podcast' %}" method="POST">
+							{% csrf_token %}
+							<input type="hidden" name="uri" value="{{ show.uri }}">
+							<button type="submit">Add to My Podcasts</button>
+						</form> -->
+
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div class="col-8">
+			<h1>Recent Episodes</h1>
+			<button>Check For New Episodes</button>
+			<table>
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th colspan="2">Podcast</th>
+						<th>Episode</th>
+						<th>Duration</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for episode in episodes %}
+					<tr>
+						<td>{{ episode.release_date }}</td>
+		  				<td><img src="{{ episode.image }}"></td>
+		  				<td><a href="{{ episode.podcast_uri }}">{{ episode.podcast_name }}</a></td>
+		  				<td><a href="{{ episode.uri }}">{{ episode.name }}</a></td>
+		  				<td>{{ episode.duration }} minutes</td>
+					</tr>
+				{% endfor %}
+			</table>
+		</div>
+		
+	</div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE-edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Spotify Podcasts</title>
+	<link rel="icon" type="image/x-icon" href="/static/img/favicon.png">
+	<link rel="stylesheet" href="/static/css/style.css">
+	<script src="/static/vendor/jquery-3.6.js"></script>
+	<script src="/static/vendor/vue-3.4.21.js"></script>
+	<script src="/static/vendor/axios-1.6.7.js"></script>
+</head>
+<body>
+	{% if not splash %}
+		<header class="header flex flex-row">
+			<h1>Spotify</h1>
+			<!--a href=""><img src="/static/img/logo.png" alt="CMHS Dynasty logo"></a-->
+			<div class="account">
+				<a href="{% url 'logout_user' %}">Logout</a>
+			</div>
+		</header>
+	{% endif %}
+
+	<main class="main">
+		{% block content %}
+		{% endblock %}
+	</main>
+	
+	{% if not splash %}
+	<footer class="footer flex">
+		<p>Footer</p>
+	</footer>
+	{% endif %}
+
+</body>
+</html>
