@@ -12,14 +12,16 @@
 	<script src="/static/vendor/axios-1.6.7.js"></script>
 </head>
 <body>
+	
 	{% if not splash %}
-		<header class="header flex flex-row">
-			<h1>Spotify</h1>
-			<!--a href=""><img src="/static/img/logo.png" alt="CMHS Dynasty logo"></a-->
-			<div class="account">
-				<a href="{% url 'logout_user' %}">Logout</a>
-			</div>
-		</header>
+		<div id="app">
+			<header class="header flex flex-row">
+				<h1>Spotify Podcast Player</h1>
+				<!--a href=""><img src="/static/img/logo.png" alt="CMHS Dynasty logo"></a-->
+				<div class="account">
+					<span>Logged in as [[ displayName ]]</span>
+				</div>
+			</header>
 	{% endif %}
 
 	<main class="main">
@@ -28,10 +30,15 @@
 	</main>
 	
 	{% if not splash %}
-	<footer class="footer flex">
-		<p>Footer</p>
-	</footer>
+			<footer class="footer flex">
+				<p>Footer</p>
+			</footer>
+		</div>
 	{% endif %}
+
+	<script>
+		{% include 'home.js' %}
+	</script>
 
 </body>
 </html>

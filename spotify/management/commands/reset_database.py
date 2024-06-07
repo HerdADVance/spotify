@@ -13,17 +13,17 @@ class Command(BaseCommand):
 
 		# Delete the PyCache folders
 		shutil.rmtree('./myauth/__pycache__')
-		#shutil.rmtree('./core/__pycache__')
+		shutil.rmtree('./core/__pycache__')
 		#shutil.rmtree('./search/__pycache__')
 
 		# Delete migrations folder
 		shutil.rmtree('./myauth/migrations')
-		#shutil.rmtree('./core/migrations')
+		shutil.rmtree('./core/migrations')
 		#shutil.rmtree('./search/migrations')
 
 		# Make and run migrations
 		call_command('makemigrations', 'myauth')
-		#call_command('makemigrations', 'core')
+		call_command('makemigrations', 'core')
 		#call_command('makemigrations', 'search')
 		call_command('migrate')
 

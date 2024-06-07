@@ -6,6 +6,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('myauth.urls')),
     path('', include('core.urls')),
+    path('api/', include('api.urls')),
     path('podcasts/', include('podcasts.urls')),
     path('', include('search.urls')),
 ]

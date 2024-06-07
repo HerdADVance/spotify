@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'spotify',
     'myauth',
     'core',
+    'api',
     'podcasts',
     'search',
     'django.contrib.admin',

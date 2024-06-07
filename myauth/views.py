@@ -6,6 +6,7 @@ from .forms import CustomLoginForm, RegistrationForm
 from .models import CustomUser
 from .util import *
 from core.util import *
+import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
 from django.http import HttpResponseRedirect, HttpResponse
 
@@ -107,7 +108,7 @@ def spotify_auth(request):
 		client_id = os.getenv('SPOTIFY_API_CLIENT_ID'),
 		client_secret = os.getenv('SPOTIFY_API_CLIENT_SECRET'),
 		redirect_uri = request.build_absolute_uri(reverse('spotify-callback')),
-		scope = 'user-library-read user-read-private user-read-email user-read-playback-state',
+		scope = 'user-library-read user-library-modify user-read-private user-read-email user-read-playback-state',
 	)
 
 	auth_url = sp_oauth.get_authorize_url()
@@ -119,7 +120,16 @@ def spotify_auth(request):
 def spotify_callback(request):
 	code = request.GET.get('code')
 	if code:
-		# Todo: pass token through to homepage
-		return redirect('home')
+
+		sp_oauth = SpotifyOAuth(
+			client_id = os.getenv('SPOTIFY_API_CLIENT_ID'),
+			client_secret = os.getenv('SPOTIFY_API_CLIENT_SECRET'),
+			redirect_uri = request.build_absolute_uri(reverse('spotify-callback')),
+			scope = 'user-library-read user-library-modify user-read-private user-read-email user-read-playback-state',
+		)
+		
+		token = sp_oauth.get_access_token(code)		
+
+		return redirect('/?login_redirect=True')
 
 

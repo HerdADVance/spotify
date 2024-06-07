@@ -12,60 +12,7 @@
 			</form>
 		</div>
 	</div>
-	
-	<!-- <div id="splash-forms" class="col-4 flex no-mar">
-		<div id="splash-forms-inner">
-			<img src="/static/img/logo.png" alt="CMHS Dynasty Logo">
-
-			<div v-if="showRegistration">
-				{% include 'forms/registration.html' %}
-			</div>
-			<div v-if="!showRegistration">
-				{% include 'forms/login.html' %}
-			</div>
-
-			<p><a @click="toggleForm" href="#">[[ linkText ]]</a></p>
-		</div>
-	</div> -->
 
 </section>
-
-
-
-<script>
-	
-	const app = Vue.createApp({
-		delimiters: ['[[', ']]'],
-		
-		data() {
-
-			const loginLinkText = "Don't have an account? Register"
-			const registrationLinkText = "Already have an account? Login"
-			const formToShow = '{{ form_to_show }}'
-
-			return {
-				loginLinkText: loginLinkText,
-				registrationLinkText: registrationLinkText,
-				showRegistration: formToShow != 'login' ? true : false,
-				linkText: formToShow != 'login' ? registrationLinkText : loginLinkText
-			}
-		},
-		methods: {
-			toggleForm(){
-				this.showRegistration = !this.showRegistration
-			}
-		},
-		watch: {
-			showRegistration(newValue){
-				if(newValue) this.linkText = this.registrationLinkText
-				else this.linkText = this.loginLinkText
-			}
-		}
-	})
-	app.mount('#splash-forms-inner')
-
-</script>
-
-
 
 {% endblock %}

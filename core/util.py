@@ -5,6 +5,7 @@ from functools import wraps
 from datetime import datetime
 from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
 import os
+import spotipy
 
 # Decorator function used on every page to redirect to splash page for Spotify login
 def redirect_if(condition_func):
@@ -14,6 +15,10 @@ def redirect_if(condition_func):
 			token = condition_func(request)
 			if not token:
 				return redirect('splash')
+			
+			sp = spotipy.Spotify(auth=token['access_token'])
+			result = sp.current_user()
+			
 			data = {
 				'token': token
 			}
@@ -28,7 +33,7 @@ def no_spotify_token(request):
 		client_id = os.getenv('SPOTIFY_API_CLIENT_ID'),
 		client_secret = os.getenv('SPOTIFY_API_CLIENT_SECRET'),
 		redirect_uri = request.build_absolute_uri(reverse('spotify-callback')),
-		scope = 'user-library-read user-read-private user-read-email user-read-playback-state',
+		scope = 'user-library-read user-library-modify user-read-private user-read-email user-read-playback-state',
 	)
 	
 	#return None
