@@ -16,6 +16,7 @@ def check_api_access_limits(ip_address, search_type):
 		'display-name': 5,
 		'new-episodes': 5,
 		'search-shows': 5,
+		'show-episodes': 25,
 		'shows-episodes': 5,
 	}
 
