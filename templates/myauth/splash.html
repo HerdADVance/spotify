@@ -1,0 +1,18 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<section id="splash" class="full row">
+	
+	<div id="splash-image" class="col-12 img-bg rel no-mar" style="background-image:url(/static/img/{{ image }});">
+		<div class="overlay flex">
+			<p class="bold">All of your Spotify podcasts and episodes on one simple page</p>
+			<form action="{% url 'spotify-auth' %}" method="POST">
+				{% csrf_token %}
+				<button type="submit">Get Started with Spotify Login</button>
+			</form>
+		</div>
+	</div>
+
+</section>
+
+{% endblock %}

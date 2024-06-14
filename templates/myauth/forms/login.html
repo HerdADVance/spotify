@@ -1,0 +1,13 @@
+<form action="{% url 'login_user' %}" method="POST" class="form-auth" id="form-login">	
+	{% csrf_token %}
+	
+	<input type="text" name= "username" placeholder="Username">
+	<input type="password" name= "password" placeholder="Password">
+
+	{% if form_to_show == 'login' %}
+		{% include 'partials/errors.html' %}
+	{% endif %}
+
+	<input type="submit" value="Login">
+
+</form>

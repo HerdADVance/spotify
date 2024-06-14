@@ -1,0 +1,22 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+<div class="con" id="search-con">
+	<h1 class="page-title">Search</h1>
+
+	<div class="row">
+		<form action="{% url 'search-podcast' %}" method="POST">
+			{% csrf_token %}
+			<input type="text" name="search-query" placeholder="Search for podcasts">
+			<button class="submit">Submit</button>
+		</form>
+
+		
+	</div>
+
+</div>
+
+
+
+{% endblock %}

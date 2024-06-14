@@ -1,0 +1,23 @@
+[
+    {
+        "model": "myauth.customUser",
+        "fields": {
+            "username": "alex",
+            "email": "alex@alex.com",
+            "password": "vance645",
+            "first_name": "Alex",
+            "last_name": "Vance",
+            "is_superuser": 1
+        }
+    },
+    {
+        "model": "myauth.customUser",
+        "fields": {
+            "username": "bev",
+            "email": "bev@bev.com",
+            "password": "Beverage645",
+            "first_name": "Michael",
+            "last_name": "Beverage"
+        }
+    }
+]

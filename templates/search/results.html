@@ -1,0 +1,40 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+<div class="con" id="search-con">
+	<h1 class="page-title">Search Results</h1>
+
+	<div class="row">
+		<div class="col-8">
+			<form action="{% url 'search-podcast' %}" method="POST">
+				{% csrf_token %}
+				<input type="text" name="search-query" placeholder="Search for podcasts">
+				<button class="submit">Submit</button>
+			</form>
+
+			{% for show in shows %}
+				<div class="show clear" style="color:white;">
+					<img src="{{ show.image }}" style="float:left; width: 100px;">
+					<h2 style="color: white;">{{ show.name }}</h2>
+					{{ show.html_description|safe }}
+					<p style="color: white;">Episodes: {{ show.num_episodes }}</p>
+					<p style="color: white">{{ show.id }}</p>
+					<form action="{% url 'add-podcast' %}" method="POST">
+						{% csrf_token %}
+						<input type="hidden" name="uri" value="{{ show.uri }}">
+						<button type="submit">Add to My Podcasts</button>
+					</form>
+				</div>
+			{% endfor %}
+		</div>
+		<div class="col-4">
+			<h2>My Podcasts</h2>
+		</div>
+	</div>
+
+</div>
+
+
+
+{% endblock %}
