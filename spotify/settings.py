@@ -26,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-59nypyjz)ekz))09#16$)y@&#(#2h42a54sb)sa=uk_9w_f!9_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_ENV', 'dev') == 'dev'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['http://spotify.ballsoherd.com', '']
 
 
 # Application definition
