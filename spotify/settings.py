@@ -29,7 +29,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DJANGO_ENV', 'dev') == 'dev'
+#DEBUG = os.getenv('DJANGO_ENV', 'dev') == 'dev'
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', 'localhost:8000', 'http://spotify.ballsoherd.com']
 
