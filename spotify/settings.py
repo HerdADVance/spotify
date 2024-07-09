@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 #DEBUG = os.getenv('DJANGO_ENV', 'dev') == 'dev'
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'localhost:8000', 'http://spotify.ballsoherd.com']
+ALLOWED_HOSTS = ['localhost', 'localhost:8000', 'spotify.ballsoherd.com']
 
 
 # Application definition
