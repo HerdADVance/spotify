@@ -14,8 +14,11 @@ from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
 import os
 
-#load_dotenv()
-#load_dotenv(dotenv_path=".prod.env")
+# Alternative to mysqlclient
+import pymysql
+pymysql.install_as_MySQLdb()
+
+
 load_dotenv(find_dotenv(raise_error_if_not_found=True))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
