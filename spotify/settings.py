@@ -150,9 +150,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 if os.getenv('DJANGO_ENV') == 'prod':
-    STATIC_URL = 'static/'
-else:
     STATIC_URL = '/'
+else:
+    STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
