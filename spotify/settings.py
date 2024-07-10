@@ -151,7 +151,7 @@ USE_TZ = True
 
 if os.getenv('DJANGO_ENV') == 'prod':
     STATIC_URL = '/'
-    MEDIA_URL = '/m/'
+    MEDIA_URL = 'm/'
 else:
     STATIC_URL = 'static/'
 
