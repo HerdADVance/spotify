@@ -15,9 +15,10 @@ def check_api_access_limits(ip_address, search_type):
 		'add-remove-shows': 5,
 		'display-name': 5,
 		'new-episodes': 5,
-		'search-shows': 5,
+		'search-playlists': 100,
+		'search-shows': 100,
 		'show-episodes': 25,
-		'shows-episodes': 5,
+		'shows-episodes': 100,
 	}
 
 	return True if num_attempts < api_call_types[search_type] else False

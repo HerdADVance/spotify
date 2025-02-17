@@ -12,8 +12,14 @@ const app = Vue.createApp({
 			loading: true,
 			numEpisodesToGet: 10,
 			numEpisodesToGetOptions: [5,10,20],
+			playlists: [],
+			playlistsSearchError: '',
+			playlistsSearchQuery: '',
 			searchOpen: false,
+			searchedPlaylists: [],
 			searchedShows: [],
+			selectedPanel: 'playlists',
+			selectedPlaylistId: null,
 			selectedShowId: null,
 			shows: [],
 			showsGridView: true,
@@ -30,23 +36,25 @@ const app = Vue.createApp({
 		// Check local storage for shows and episodes
 		var storageShows = localStorage.getItem('shows');
 		var storageEpisodes = localStorage.getItem('episodes');
-		//var storageEpisodes = ''
-		//var storageShows = ''
+		var storagePlaylists = localStorage.getItem('playlists');
 
 		// Load Shows & Episodes from Storage if exist, and end mounted 
-		if(storageShows && storageEpisodes){
-			this.loadShowsAndEpisodes(storageShows, storageEpisodes);
+		if(storageShows && storageEpisodes && storagePlaylists){
+			console.log('load from local')
+			this.loadAll(storageShows, storageEpisodes, storagePlaylists);
 			this.removeLoading();
 			return;
 		}
 
 		// Get Shows & Episodes from Spotify API, save to storage 
-		this.getFollowedShowsAndEpisodes()
+		this.getAllFollowed()
 			.then(result => {
 				var shows = result.data.shows;
 				var episodes = result.data.episodes;
-				this.loadShowsAndEpisodes(shows, episodes);
-				this.saveAllToStorage(shows, episodes);
+				var playlists = result.data.playlists;
+				console.log(result.data)
+				this.loadAll(shows, episodes, playlists);
+				this.saveAllToStorage(shows, episodes, playlists);
 				this.removeLoading();
 			})
 			.catch(error => {
@@ -119,17 +127,17 @@ const app = Vue.createApp({
 			return showsInfo;
 		},
 
-		getFollowedShowsAndEpisodes(){
+		getAllFollowed(){
 			return new Promise((resolve, reject) => {
 				axios.defaults.headers.common['X-CSRFToken'] = this.csrf;
-			    axios.post('{% url 'shows-episodes' %}')
+			    axios.post('{% url 'get-all-followed' %}')
 				.then(response => {
 					resolve(response);
 				})
 				.catch(error => {
 					console.log(error)
 					reject(error.response.data.error);
-			 		reject('Failed to get shows and episodes. Please try again.');
+			 		reject('Failed to get data. Please try again.');
   				})
   			});
 		},
@@ -154,6 +162,29 @@ const app = Vue.createApp({
 	        return false
 		},
 
+		getSearchedPlaylists(){
+			if(!this.playlistsSearchQuery){
+				this.playlistsSearchError = "Search query can't be empty. Please try again.";
+				return false;
+			}
+			
+			const ff = new FormData();
+			ff.append('query', this.playlistsSearchQuery);
+		
+			axios.defaults.headers.common['X-CSRFToken'] = this.csrf;
+			this.loading = true;
+			axios.post('{% url 'search-playlists' %}', ff)
+				.then(response => {
+					this.loadSearchedPlaylists(response.data.playlists);
+					this.removeLoading();
+	        	})
+		        .catch(error => {
+					this.displayErrorMessage(error.response.data.error);
+				});
+			
+			return false
+		},
+
 		getSearchedShows(){
 			if(!this.showsSearchQuery){
 				this.showsSearchError = "Search query can't be empty. Please try again.";
@@ -174,7 +205,7 @@ const app = Vue.createApp({
 					this.displayErrorMessage(error.response.data.error);
 				});
 
-	        return false
+			return false
 		},
 
 		getShowEpisodes(){
@@ -216,9 +247,19 @@ const app = Vue.createApp({
 			}
 		},
 
+		handleSelectedPlaylistClick(playlist){
+			//this.selectedPlaylistId = playlist.id
+			window.location.href = playlist.uri;
+		},
+
 		handleSelectedShowClick(show){
 			this.selectedShowId = show.id
 			this.filterEpisodesByShow(show)
+		},
+
+		isMyPlaylist(playlistId){
+			if(this.playlistIds.includes(playlistId)) return true;
+				else return false;
 		},
 
 		isMyShow(showId){
@@ -226,9 +267,20 @@ const app = Vue.createApp({
 				else return false;
 		},
 
+		loadAll(shows, episodes, playlists){
+			this.shows = JSON.parse(shows);
+			this.episodes = JSON.parse(episodes);
+			this.playlists = JSON.parse(playlists);
+			this.filteredEpisodes = JSON.parse(episodes);
+		},
+
 		loadNewEpisodes(episodes){
 			this.episodes = JSON.parse(episodes)
 			this.filteredEpisodes = JSON.parse(episodes)
+		},
+
+		loadSearchedPlaylists(playlists){
+			this.searchedPlaylists = JSON.parse(playlists);
 		},
 
 		loadSearchedShows(shows){
@@ -239,12 +291,6 @@ const app = Vue.createApp({
 			episodes.forEach(episode => {
 				this.episodes.push(episode)
 			});
-		},
-
-		loadShowsAndEpisodes(shows, episodes){
-			this.shows = JSON.parse(shows);
-			this.episodes = JSON.parse(episodes);
-			this.filteredEpisodes = JSON.parse(episodes);
 		},
 
 		removeLoading(){
@@ -261,13 +307,18 @@ const app = Vue.createApp({
 			});
 		},
 
-		saveAllToStorage(shows, episodes){
+		saveAllToStorage(shows, episodes, playlists){
 			localStorage.setItem('shows', shows);
 			localStorage.setItem('episodes', episodes);
+			localStorage.setItem('playlists', playlists);
 		},
 
 		saveEpisodesToStorage(){
 			localStorage.setItem('episodes', JSON.stringify(this.episodes));
+		},
+
+		savePlaylistsToStorage(){
+			localStorage.setItem('playlists', JSON.stringify(this.playlists));
 		},
 
 		saveShowsToStorage(){
@@ -276,6 +327,10 @@ const app = Vue.createApp({
 
 		selectedShow(){
 			return this.shows.find(obj => obj.id == this.selectedShowId);
+		},
+
+		setSelectedPanel(panel){
+			this.selectedPanel = panel;
 		},
 
 		sortEpisodesByDate(){
@@ -302,6 +357,9 @@ const app = Vue.createApp({
 		}
 	},
 	computed: {
+		playlistIds() {
+	  		return this.playlists.map(playlist => playlist.id);
+		},
 		showIds() {
 	  		return this.shows.map(show => show.id);
 		}

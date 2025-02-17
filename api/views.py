@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 import json
 import spotipy
+from pprint import pprint
 from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
 from spotipy.exceptions import SpotifyException
 from .util import *
@@ -15,7 +16,7 @@ VIEWS IN THIS FILE
 - add_remove_show
 - get_new_episodes
 - get_searched_shows
-- get_shows_and_episodes
+- get_all_followed
 - get_user_display_name
 ------------------
 '''
@@ -130,6 +131,60 @@ def get_new_episodes(request, data):
 	# Return Episodes to front end
 	return JsonResponse({'episodes': json.dumps(episodes)}, safe=False)
 
+
+# Get playlists results for user's search
+# ----------------------------------
+@redirect_if(no_spotify_token)
+def get_searched_playlists(request, data):
+
+	# Return error if search query somehow blank (also checked on frontend)
+	search_query = request.POST.get('query')
+	if not search_query:
+		return send_error("You didn't submit a search query. Please try again.", 400)
+
+	# Check our DB to see if user hasn't exceeded API call limits, return error if has
+	ip_address = request.META.get('REMOTE_ADDR')
+	allowed_to_send = check_api_access_limits(ip_address, 'search-playlists')
+	allowed_to_send = True;
+	if not allowed_to_send:
+		return send_error("You have exceeded your hourly limit for searching shows. Please wait until later to try again.", 400)
+
+	# Spotify Token brought in through decorator 
+	token = data['token']['access_token']
+	sp = spotipy.Spotify(auth=token)
+
+	# Save new search attempt to DB or send error
+	saved_attempt = save_search_attempt(ip_address, 'search-playlists', search_query)
+	if not saved_attempt:
+		return send_error('There was a problem with our database. Please try again later.', 400)
+
+	# Attempt to get searched playlists result from Spotify API
+	try:
+		result = sp.search(search_query, type='playlist', limit=50)
+		print(result)
+	except Exception as error:
+		return send_error('There was a problem searching for playlists. Please try again.', 400)
+
+	# Empty list of searched playlists to fill and return to front end
+	playlists = []
+
+	# Loop through playlists returned from API
+	for playlist in result['playlists']['items']:
+		
+		# Append Playlist to list
+		if playlist is not None:
+			playlists.append({
+				'name': playlist['name'],
+				'description': playlist['description'],
+				'uri': playlist['uri'],
+				'image': playlist['images'][0]['url'],
+				'owner': playlist['owner']['display_name'],
+				'tracks': playlist['tracks']['total'],
+				'id': playlist['id']
+			})
+
+	# Return searched playlists to front end
+	return JsonResponse({'playlists': json.dumps(playlists)}, safe=False)
 
 
 
@@ -249,10 +304,10 @@ def get_show_episodes(request, data):
 
 
 
-# Get User's Followed Shows and Episodes
+# Get User's Followed Data (Shows with Episodes, Playlists)
 # --------------------------------------
 @redirect_if(no_spotify_token)
-def get_shows_and_episodes(request, data):
+def get_all_followed(request, data):
 
 	# Number of episodes from front end
 	num_episodes = request.POST.get('num_episodes') or 10
@@ -273,8 +328,33 @@ def get_shows_and_episodes(request, data):
 	sp = spotipy.Spotify(auth=token)
 
 	# Empty lists to be filled and returned to front end
+	playlists = []
 	shows = []
 	episodes = []
+
+
+	# Attempt to get followed playlists from Spotify API
+	try:
+		playlists_result = sp.current_user_playlists(limit=20, offset=0)
+		print(playlists_result)
+
+	except Exception as error:
+		print(error)
+		return send_error('There was a problem retrieving your playlists. Please try again.', 400)
+
+	# Loop through followed playlists
+	for playlist in playlists_result['items']:
+
+		# Append each show to Shows list
+		playlists.append({
+			'name': playlist['name'],
+			'description': playlist['description'],
+			'uri': playlist['uri'],
+			'image': playlist['images'][0]['url'],
+			'owner': playlist['owner']['display_name'],
+			'id': playlist['id']
+		})
+
 
 	# Attempt to get followed shows from Spotify API
 	try:
@@ -315,13 +395,15 @@ def get_shows_and_episodes(request, data):
 				'image': show['images'][1]['url']
 			})
 
+
+
 	# Sort and format Shows and Episodes
 	shows = sorted(shows, key=lambda x: x['name'])
 	episodes = sorted(episodes, key=lambda x: x['release_date'], reverse=True)
 	episodes = format_dates(episodes)
 
 	# Return Shows and Episodes to front end
-	return JsonResponse({'shows': json.dumps(shows), 'episodes': json.dumps(episodes)}, safe=False)
+	return JsonResponse({ 'playlists': json.dumps(playlists), 'shows': json.dumps(shows), 'episodes': json.dumps(episodes) }, safe=False)
 
 
 

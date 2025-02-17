@@ -1,8 +1,17 @@
 {% extends 'index.html' %}
 
 {% block content %}
+	
+	<nav class="nav">
+		<ul>
+			<li @click="setSelectedPanel('podcasts')">Podcasts</li>
+			<li @click="setSelectedPanel('playlists')">Playlists</li>
+			<li @click="setSelectedPanel('new-stuff')">New Stuff</li>
+		</ul>
+	</nav>
 
 	<div class="con">
+		
 		<div v-if="loading" :class="[{'error': errorMessage}, 'overlay']">
 			<div class="overlay-inner">
 				<div v-if="errorMessage">
@@ -15,115 +24,168 @@
 				</div>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-8 no-mar" id="col-episodes">
-				<div class="inset">
-					<div class="title flex flex-row flex-spread">
-						<h1>Recent Episodes</h1>
-						<form @submit.prevent="getNewEpisodes" class="clear auto" id="episodes-new">
-							<div>
-								<ul class="clear">
-									<li v-for="num in numEpisodesToGetOptions" @click="toggleNumEpisodesToGet(num)" :class="{'active': num == numEpisodesToGet }">[[ num ]]</li>
-								</ul>
-								<p>Episodes per show</p>
-							</div>
-							<div>
-								<button class="btn" type="submit">Check For New Episodes</button>
-								<p>Max 5 per hour</p>
-							</div>
-						</form>
-					</div>
-					
-					<table v-if="filteredEpisodes.length > 0" class="sticky no-mar">
-						<thead>
-							<tr>
-								<th>Date</th>
-								<th colspan="2">Podcast</th>
-								<th>Episode</th>
-								<th>Duration</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr v-for="episode in filteredEpisodes">
-								<td>[[ episode.release_date ]]</td>
-				  				<td><img :src="episode.image"></td>
-				  				<td><a :href="episode.podcast_uri">[[ episode.podcast_name ]]</a></td>
-				  				<td><a :href="episode.uri">[[ episode.name ]]</a></td>
-				  				<td>[[ episode.duration ]] minutes</td>
-							</tr>
-						</tbody>
-					</table>
-					<div v-else class="card">
-						<div v-if="shows.length == 0">
-							<p>It looks like you're not following any podcasts. Use the 'Add More' section to find some of your favorite shows.</p>
-						</div>
-						<div v-else>
-							<p>You don't have any episodes for this show. This is most likely because you added it after your most recent episodes update. Click below to search for new ones.</p>
-							<form @submit.prevent="getShowEpisodes" method="POST" class="auto">
-								<button>Get Episodes for This Show</button>
+
+		<section :class="{'hide': selectedPanel != 'podcasts' }" id="podcasts">
+			<div class="row">
+				<div class="col-8 no-mar" id="col-episodes">
+					<div class="inset">
+						<div class="title flex flex-row flex-spread">
+							<h1>Recent Episodes</h1>
+							<form @submit.prevent="getNewEpisodes" class="clear auto" id="episodes-new">
+								<div>
+									<ul class="clear">
+										<li v-for="num in numEpisodesToGetOptions" @click="toggleNumEpisodesToGet(num)" :class="{'active': num == numEpisodesToGet }">[[ num ]]</li>
+									</ul>
+									<p>Episodes per show</p>
+								</div>
+								<div>
+									<button class="btn" type="submit">Check For New Episodes</button>
+									<p>Max 5 per hour</p>
+								</div>
 							</form>
 						</div>
+						
+						<table v-if="filteredEpisodes.length > 0" class="sticky no-mar">
+							<thead>
+								<tr>
+									<th>Date</th>
+									<th colspan="2">Podcast</th>
+									<th>Episode</th>
+									<th>Duration</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="episode in filteredEpisodes">
+									<td>[[ episode.release_date ]]</td>
+					  				<td><img :src="episode.image"></td>
+					  				<td><a :href="episode.podcast_uri">[[ episode.podcast_name ]]</a></td>
+					  				<td><a :href="episode.uri">[[ episode.name ]]</a></td>
+					  				<td>[[ episode.duration ]] minutes</td>
+								</tr>
+							</tbody>
+						</table>
+						<div v-else class="card">
+							<div v-if="shows.length == 0">
+								<p>It looks like you're not following any podcasts. Use the 'Add More' section to find some of your favorite shows.</p>
+							</div>
+							<div v-else>
+								<p>You don't have any episodes for this show. This is most likely because you added it after your most recent episodes update. Click below to search for new ones.</p>
+								<form @submit.prevent="getShowEpisodes" method="POST" class="auto">
+									<button>Get Episodes for This Show</button>
+								</form>
+							</div>
+						</div>
 					</div>
-
-
+				</div>
+				<div class="col-4 no-mar" id="col-podcasts">
+					<div class="inset">
+						<div class="title flex flex-row flex-spread">
+							<h1>My Podcasts</h1>
+						</div>
+						<h2 @click="toggleSearchOpen" class="header-bar point flex flex-row flex-spread">
+							<span>Add More</span>
+							<img v-if="searchOpen" src="/static/img/minus-circle.svg">
+							<img v-else src="/static/img/plus-circle.svg">
+						</h2>
+						<div id="search-podcasts">
+							<div v-if="searchOpen" id="search-podcasts-open">
+								<p class="smaller">You can search for new podcasts up to 5 times per hour.</p>
+								<form @submit.prevent="getSearchedShows" method="POST" class="auto">
+									<input type="text" v-model="showsSearchQuery" class="no-mar" placeholder="Enter podcast name or genre">
+									<span v-if="showsSearchError" class="error">[[ showsSearchError ]]</span>
+									<button class="btn" type="submit">Search Shows</button>
+								</form>
+								<div id="searched-shows">
+									<div v-for="show in searchedShows" class="searched-show" style="color:white;">
+										<img :src="show.image">
+										<strong><a :href="show.uri">[[ show.name ]]</a></strong>
+										<p>[[ show.description ]]</p>
+										<p>Episodes: [[ show.num_episodes ]]</p>
+										<form>
+											<button v-if="isMyShow(show.id)" @click.prevent="addOrRemoveShow('remove', show)" type="submit" class="btn remove">Remove from My Podcasts</button>
+											<button v-else type="submit" @click.prevent="addOrRemoveShow('add', show)" class="btn add">Add to My Podcasts</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+						<h2 class="header-bar point flex flex-row flex-spread">
+							<span>Sort By Show</span>
+							<span class="click-icons">
+								<img @click="toggleShowsGridView(true)" :class="{'active': showsGridView}" src="/static/img/grid.svg">
+								<img @click="toggleShowsGridView(false)" :class="{'active': !showsGridView}"  src="/static/img/list.svg">
+							</span>
+						</h2>
+						<div>
+							<ul :class="[{'grid': showsGridView}, 'sticky', 'clear']" id="shows">
+								<li @click="handleAllShowsClick()"><strong>All Shows</strong></li>
+								<li v-for="show in shows" @click="handleSelectedShowClick(show)" :class=" [{'active': show.id == selectedShowId}, 'flex', 'flex-row']" :key="show.id">
+									<img :src="show.image">
+									<strong>[[ show.name ]]</strong>
+									<div v-if="show.id == selectedShowId" class="overlay">
+										<div class="overlay-inner">
+											<button @click.prevent="addOrRemoveShow('remove', show)">Remove</button>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div class="col-4 no-mar" id="col-podcasts">
-				<div class="inset">
-					<div class="title flex flex-row flex-spread">
-						<h1>My Podcasts</h1>
+		</section>
+		
+		<section :class="{'hide': selectedPanel != 'playlists' }" id="playlists">
+			<div class="row">
+				<div class="col-7 no-mar" id="col-playlists">
+					<div class="inset">
+						<h1>My Playlists</h1>
+						<div>
+							<ul :class="['sticky', 'clear']" id="my-playlists">
+								<li v-for="playlist in playlists" @click="handleSelectedPlaylistClick(playlist)" :class=" [{'active': playlist.id == selectedPlaylistId}]" :key="playlist.id">
+									<img :src="playlist.image">
+									<strong>[[ playlist.name ]]</strong>
+									<div v-if="playlist.id == selectedPlaylistId" class="overlay">
+										<div class="overlay-inner">
+											<button @click.prevent="addOrRemovePlaylist('remove', playlist)">Remove</button>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
 					</div>
-					<h2 @click="toggleSearchOpen" class="point flex flex-row flex-spread">
-						<span>Add More</span>
-						<img v-if="searchOpen" src="/static/img/minus-circle.svg">
-						<img v-else src="/static/img/plus-circle.svg">
-					</h2>
-					<div id="search-podcasts">
-						<div v-if="searchOpen" id="search-podcasts-open">
-							<p class="smaller">You can search for new podcasts up to 5 times per hour.</p>
-							<form @submit.prevent="getSearchedShows" method="POST" class="auto">
-								<input type="text" v-model="showsSearchQuery" class="no-mar" placeholder="Enter podcast name or genre">
-								<span v-if="showsSearchError" class="error">[[ showsSearchError ]]</span>
-								<button class="btn" type="submit">Search Shows</button>
-							</form>
-							<div id="searched-shows">
-								<div v-for="show in searchedShows" class="searched-show" style="color:white;">
-									<img :src="show.image">
-									<strong><a :href="show.uri">[[ show.name ]]</a></strong>
-									<p>[[ show.description ]]</p>
-									<p>Episodes: [[ show.num_episodes ]]</p>
+				</div>
+				
+				<div class="col-5 no-mar" id="col-playlists-search">
+					<div class="inset">
+						<h1>Search Playlists</h1>
+						<form @submit.prevent="getSearchedPlaylists" method="POST" class="auto">
+							<input type="text" v-model="playlistsSearchQuery" class="no-mar" placeholder="Enter podcast name or genre">
+							<span v-if="playlistsSearchError" class="error">[[ playlistsSearchError ]]</span>
+							<button class="btn" type="submit">Search Playlists</button>
+						</form>
+						<div id="searched-playlists">
+							<div v-for="playlist in searchedPlaylists" class="row">
+								<div class="col-3">
+									<img :src="playlist.image">
+								</div>
+								<div class="col-9">
+									<strong><a :href="playlist.uri">[[ playlist.name ]]</a></strong>
+									<p>[[ playlist.description ]]</p>
+									<p>Tracks: [[ playlist.tracks ]]</p>
 									<form>
-										<button v-if="isMyShow(show.id)" @click.prevent="addOrRemoveShow('remove', show)" type="submit" class="btn remove">Remove from My Podcasts</button>
-										<button v-else type="submit" @click.prevent="addOrRemoveShow('add', show)" class="btn add">Add to My Podcasts</button>
+										<button v-if="isMyPlaylist(playlist.id)" @click.prevent="addOrRemovePlaylist('remove', playlist)" type="submit" class="btn remove">Remove from My Podcasts</button>
+										<button v-else type="submit" @click.prevent="addOrRemovePlaylist('add', playlist)" class="btn add">Add to My Podcasts</button>
 									</form>
 								</div>
 							</div>
 						</div>
 					</div>
-					<h2 class="point flex flex-row flex-spread">
-						<span>Sort By Show</span>
-						<span class="click-icons">
-							<img @click="toggleShowsGridView(true)" :class="{'active': showsGridView}" src="/static/img/grid.svg">
-							<img @click="toggleShowsGridView(false)" :class="{'active': !showsGridView}"  src="/static/img/list.svg">
-						</span>
-					</h2>
-					<div>
-						<ul :class="[{'grid': showsGridView}, 'sticky', 'clear']" id="shows">
-							<li @click="handleAllShowsClick()"><strong>All Shows</strong></li>
-							<li v-for="show in shows" @click="handleSelectedShowClick(show)" :class=" [{'active': show.id == selectedShowId}, 'flex', 'flex-row']" :key="show.id">
-								<img :src="show.image">
-								<strong>[[ show.name ]]</strong>
-								<div v-if="show.id == selectedShowId" class="overlay">
-									<div class="overlay-inner">
-										<button @click.prevent="addOrRemoveShow('remove', show)">Remove</button>
-									</div>
-								</div>
-							</li>
-						</ul>
-					</div>
 				</div>
+
 			</div>
-		</div>
+		</section>
+
 	</div>
 
 

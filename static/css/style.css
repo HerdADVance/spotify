@@ -160,15 +160,15 @@ span.error{color: crimson; display: block; font-size: 0.75rem; font-weight: bold
 
 
 /* HEADER */
-.header{background: linear-gradient(to top left, #2dd866 0%, #139c71 100%); box-shadow: 0px 1px 16px #ffd6f9; border-bottom: 1px solid #EEE; height: 65px; padding: 0 2.5rem; z-index: 9;}
+.header{background: linear-gradient(to top left, #2dd866 0%, #139c71 100%); box-shadow: 0px 1px 16px #ffd6f9; border-bottom: 1px solid #EEE; height: 5rem; padding: 0 2.5rem; z-index: 9;}
 .header div{margin-left: auto;}
-.header h1{color: #c9ffc2; font-family: sans-serif; font-size: 1.8rem; font-weight: bold; margin: 0; position: absolute; text-align: center; text-transform: capitalize; width: 100%;}
-.header span{}
+.header h1{color: #f5efff; font-family: sans-serif; font-size: 1.8rem; font-weight: bold; margin: 0; position: absolute; text-align: center; text-transform: capitalize; width: 100%;}
+.header h1 span{color: #0a5407; display: block; font-size: 0.75rem; padding-top: 0.25rem; text-transform: none;}
 
 /* NAV */
 .nav ul{display: flex;}
-.nav li{background: crimson; border-right: 1px solid #EEE; flex: 1; height: 2.5rem; line-height: 2.5rem; transition: background 0.25s ease;}
-.nav li:hover{background: firebrick;}
+.nav li{background: #a05474; border-right: 1px solid #EEE; color: white; cursor: pointer; flex: 1; font-size: 1.25rem; font-weight: bold; height: 2.5rem; line-height: 2.5rem; transition: background 0.25s ease;}
+.nav li:hover{background: #792448;}
 .nav li a{color: white; display: block; font-size: 1.375rem; text-align: center; text-decoration: none; width: 100%;}
 
 /* CONTAINERS */
@@ -178,9 +178,9 @@ span.error{color: crimson; display: block; font-size: 0.75rem; font-weight: bold
 /* PAGE/COLUMN TITLES */
 .title{margin-bottom: 1.25rem;}
 h1{color: #e10897; font-size: 1.625rem; font-weight: bold; margin: 0; text-transform: uppercase;}
-h2{background: linear-gradient(to right, #6f5871 0%, #139c71 100%); border-bottom: 1px solid antiquewhite; color: white; display: flex; font-size: 1.125rem; font-weight: bold; padding: 0.5rem 0.75rem; text-transform: uppercase;}
-h2 span{font-weight: bold;}
-h2 img{width: 1.75rem;}
+h2.header-bar{background: linear-gradient(to right, #6f5871 0%, #139c71 100%); border-bottom: 1px solid antiquewhite; color: white; display: flex; font-size: 1.125rem; font-weight: bold; padding: 0.5rem 0.75rem; text-transform: uppercase;}
+h2.header-bar span{font-weight: bold;}
+h2.header-bar img{width: 1.75rem;}
 
 /* SPLASH PAGE */
 #splash-image .overlay{background:rgba(45,216,102,0.75); padding: 0 25%;}
@@ -263,6 +263,18 @@ td img{width: 60px;}
 #shows.grid li .overlay button{font-size: 0.625rem; margin-left: 0; height: auto; width: 90%;}
 #shows.grid li .overlay button:hover{background: crimson;}
 
+
+/* PLAYLISTS SECTION 
+===================== */
+#col-playlists{background: #230117; border-right: 1px solid #600359;}
+#my-playlists{display: flex; flex-wrap: wrap; margin-top: 1rem;}
+#my-playlists li{border: 1px solid white; cursor: pointer; flex-basis: 25%; margin-top: 0.5rem; position: relative;}
+#my-playlists li strong{background: rgba(70,0,175,0.9); border-top: 1px solid #CCC; bottom: 0; color:white; display: block; font-size: 0.625rem; padding: 0.625rem 0.125rem; position: absolute; text-align: center; width: 100%;}
+
+#col-playlists-search{background: #020002;}
+#searched-playlists{margin-top: 1rem;}
+#searched-playlists img{width: 100%;}
+#searched-playlists p{color: white;}
 
 
 /* FOOTER */

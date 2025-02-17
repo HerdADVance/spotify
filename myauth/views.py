@@ -46,7 +46,7 @@ def spotify_auth(request):
 		client_id = os.getenv('SPOTIFY_API_CLIENT_ID'),
 		client_secret = os.getenv('SPOTIFY_API_CLIENT_SECRET'),
 		redirect_uri = request.build_absolute_uri(reverse('spotify-callback')),
-		scope = 'user-library-read user-library-modify user-read-private user-read-email user-read-playback-state',
+		scope = 'user-library-read user-library-modify user-read-private user-read-email user-read-playback-state playlist-read-private',
 	)
 
 	auth_url = sp_oauth.get_authorize_url()
@@ -65,7 +65,7 @@ def spotify_callback(request):
 			client_id = os.getenv('SPOTIFY_API_CLIENT_ID'),
 			client_secret = os.getenv('SPOTIFY_API_CLIENT_SECRET'),
 			redirect_uri = request.build_absolute_uri(reverse('spotify-callback')),
-			scope = 'user-library-read user-library-modify user-read-private user-read-email user-read-playback-state',
+			scope = 'user-library-read user-library-modify user-read-private user-read-email user-read-playback-state playlist-read-private',
 		)
 		
 		token = sp_oauth.get_access_token(code)		
